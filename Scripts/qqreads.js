@@ -258,7 +258,7 @@ function qqreadconfig() {
 function qqreadtime() {
   return new Promise((resolve, reject) => {
     const toqqreadtimeurl = {
-      url: qqreadtimeurlVal.replace(/readTime=/g, `readTime=${TIME}`),
+      url: qqreadtimeurlVal.replace(/readTime=/g, 'readTime=${TIME}'),
 
       headers: JSON.parse(qqreadtimeheaderVal),
     };
@@ -357,7 +357,7 @@ function qqreadsign() {
       if (logs) $.log(`${jsname}, 金币签到: ${data}`);
       sign = JSON.parse(data);
 
-      if (sign.data.videoDoneFlag) {
+      if (sign.data.videoDoneFlag != null) {
         tz += "【金币签到】:获得" + sign.data.todayAmount + "金币\n";
       }
 
@@ -445,7 +445,7 @@ function qqreadbox() {
       if (logs) $.log(`${jsname}, 宝箱奖励: ${data}`);
       box = JSON.parse(data);
 
-      if (box.data.count >= 0) {
+      if (box.data.count != null && box.data.count >= 0) {
         tz +=
           "【宝箱奖励" +
           box.data.count +
