@@ -1,6 +1,6 @@
 /*ziye
 
-本人github地址     https://github.com/ziye12/JavaScript 
+源 github 地址     https://github.com/ziye12/JavaScript 
 转载请备注个名字，谢谢
 */
 
