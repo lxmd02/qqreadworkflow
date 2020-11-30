@@ -258,7 +258,7 @@ function qqreadconfig() {
 function qqreadtime() {
   return new Promise((resolve, reject) => {
     const toqqreadtimeurl = {
-      url: qqreadtimeurlVal.replace(/readTime=/g, 'readTime=${TIME}'),
+      url: qqreadtimeurlVal.replace(/readTime=/g, `readTime=${TIME}`),
 
       headers: JSON.parse(qqreadtimeheaderVal),
     };
