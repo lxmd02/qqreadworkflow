@@ -186,7 +186,6 @@ function qqreadinfo() {
       if (logs) $.log(`${jsname}, 用户名: ${data}`);
       const info = JSON.parse(data);
       tz += "\n【用户信息】: " + info.data.user.nickName + "\n";
-
       resolve();
     });
   });
@@ -203,9 +202,7 @@ function qqreadtake() {
     $.post(toqqreadtakeurl, (error, response, data) => {
       if (logs) $.log(`${jsname}, 阅豆签到: ${data}`);
       let take = JSON.parse(data);
-      if (take.data.takeTicket > 0) {
-        tz += "【阅豆签到】:获得 " + take.data.takeTicket + " 豆\n";
-      }
+      if (take.data.takeTicket > 0) tz += "【阅豆签到】:获得 " + take.data.takeTicket + " 豆\n";
       resolve();
     });
   });
@@ -215,16 +212,13 @@ function qqreadtake() {
 function qqreadconfig() {
   return new Promise((resolve, reject) => {
     const toqqreadconfigurl = {
-      url:
-        "https://mqqapi.reader.qq.com/mqq/page/config?router=%2Fpages%2Fbook-read%2Findex&options=",
+      url: "https://mqqapi.reader.qq.com/mqq/page/config?router=%2Fpages%2Fbook-read%2Findex&options=",
       headers: JSON.parse(qqreadheaderVal)
     };
-
     $.get(toqqreadconfigurl, (error, response, data) => {
       if (logs) $.log(`${jsname}, 阅读时长查询: ${data}`);
       config = JSON.parse(data);
-      if (config.code == 0)
-        tz += "【时长查询】:今日阅读 " + (config.data.pageParams.todayReadSeconds / 60).toFixed(0) + " 分钟\n";
+      if (config.code == 0) tz += "【时长查询】:今日阅读 " + (config.data.pageParams.todayReadSeconds / 60).toFixed(0) + " 分钟\n";
       resolve();
     });
   });
@@ -263,6 +257,7 @@ function qqreadssr1() {
         resolve();
       });
     }
+    resolve();
   });
 }
 
@@ -279,12 +274,12 @@ function qqreadssr2() {
         if (logs) $.log(`${jsname}, 金币奖励2: ${data}`);
         ssr2 = JSON.parse(data);
         if (ssr2.code === 0) {
-          if (ssr2.data.amount > 0)
-            tz += "【阅读金币2】获得 " + ssr2.data.amount + " 金币\n";
+          if (ssr2.data.amount > 0) tz += "【阅读金币2】获得 " + ssr2.data.amount + " 金币\n";
         }
         resolve();
       });
     }
+    resolve();
   });
 }
 
@@ -301,12 +296,12 @@ function qqreadssr3() {
         if (logs) $.log(`${jsname}, 金币奖励3: ${data}`);
         let ssr3 = JSON.parse(data);
         if (ssr3.code === 0) {
-          if (ssr3.data.amount > 0)
-            tz += "【阅读金币3】获得 " + ssr3.data.amount + " 金币\n";
+          if (ssr3.data.amount > 0) tz += "【阅读金币3】获得 " + ssr3.data.amount + " 金币\n";
         }
         resolve();
       });
     }
+    resolve();
   });
 }
 
