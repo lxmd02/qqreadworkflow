@@ -115,7 +115,7 @@ function qqreadtask() {
       tz +=
         "【任务列表】:余额 " +
         task.data.user.amount +
-        " 金币   " + (task.data.user.amount / 10000) + " 元"
+        " 金币   " + (task.data.user.amount / 10000) + " 元\n"
       "【第" +
         task.data.invite.issue +
         "期】:时间 " +
