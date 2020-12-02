@@ -6,7 +6,7 @@ name: qqreads workflow
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/11 * * * *'
+    - cron: '*/7 * * * *'
   
 jobs:
   build:
