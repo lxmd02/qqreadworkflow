@@ -65,8 +65,8 @@ async function qqRead() {
 
     await qqreadwktime();//周时长查询
     await qqreadpick();//领周时长奖励
-    await showmsg();//通知
   }
+  await showmsg();//通知
 }
 
 function getCookiesFromSecret() {
