@@ -29,7 +29,7 @@ let tz = "", task = "", config, ssr2 = "", wktime;
     $.done();
   })
 
-function qqRead() {
+async function qqRead() {
   for (const item of cookiesArr) {
     qqreadheaderVal = item["qqreadheaderVal"];
     qqreadtimeurlVal = item["qqreadtimeurlVal"];
