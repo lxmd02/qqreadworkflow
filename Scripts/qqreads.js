@@ -116,7 +116,7 @@ function qqreadtask() {
         "【任务列表】:余额 " +
         task.data.user.amount +
         " 金币   " + (task.data.user.amount / 10000) + " 元\n"
-        "【第" +
+      "【第" +
         task.data.invite.issue +
         "期】:时间 " +
         task.data.invite.dayRange +
@@ -459,18 +459,20 @@ function qqreadpick() {
       });
       resolve();
     }
+    resolve();
   });
 }
 
 function showmsg() {
-  //tz += `\n脚本执行：${new Date().toLocaleString()}\n\n`;
-  tz += `\n========= 脚本执行完毕时间-北京时间(UTC+8)：${new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toLocaleString()}  =============\n`;
-  console.log(tz);
-  if (notifyInterval == 1) $.msg(jsname, "", tz);//显示所有通知
-  else if (notifyInterval == 2 && task.data.treasureBox.doneFlag == 0) $.msg(jsname, "", tz);//宝箱领取成功通知
-  else if (notifyInterval == 3 && task.data.treasureBox.count == 0 || task.data.treasureBox.count == 15 || task.data.treasureBox.count == 30 || task.data.treasureBox.count == 45 || task.data.treasureBox.count == 60)
-    $.msg(jsname, "", tz); //宝箱每15次通知一次
-  resolve();
+  return new Promise(async resolve => {
+    tz += `\n========= 脚本执行完毕时间-北京时间(UTC+8)：${new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toLocaleString()}  =============\n`;
+    console.log(tz);
+    if (notifyInterval == 1) $.msg(jsname, "", tz);//显示所有通知
+    else if (notifyInterval == 2 && task.data.treasureBox.doneFlag == 0) $.msg(jsname, "", tz);//宝箱领取成功通知
+    else if (notifyInterval == 3 && task.data.treasureBox.count == 0 || task.data.treasureBox.count == 15 || task.data.treasureBox.count == 30 || task.data.treasureBox.count == 45 || task.data.treasureBox.count == 60)
+      $.msg(jsname, "", tz); //宝箱每15次通知一次
+    resolve();
+  });
 }
 
 // prettier-ignore
