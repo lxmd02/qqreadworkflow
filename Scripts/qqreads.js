@@ -41,20 +41,20 @@ async function qqRead() {
 
     if (task && task.data) {
       if (task.data.taskList) {
-        if (task.data.taskList[0].doneFlag == 0) {
+        if (task.data.taskList[2].doneFlag == 0) {
           await qqreadsign();//金币签到
           await qqreadtake();//阅豆签到
           await qqreadsign2();//签到翻倍
         }
         if (config && config.data && config.data.pageParams) {
           if (config.data.pageParams.todayReadSeconds / 3600 <= maxtime) await qqreadtime();//阅读时长
-          if (task.data.taskList[2].doneFlag == 0) {
+          if (task.data.taskList[1].doneFlag == 0) {
             await qqreadssr1();//阅读金币1
             await qqreadssr2();//阅读金币2
             await qqreadssr3();//阅读金币3
           }
         }
-        if (task.data.taskList[1].doneFlag == 0) await qqreaddayread();//阅读任务
+        if (task.data.taskList[0].doneFlag == 0) await qqreaddayread();//阅读任务
         if (task.data.taskList[3].doneFlag == 0) await qqreadvideo();//视频奖励
       }
       if (task.data.treasureBox) {
