@@ -4,15 +4,14 @@
 name: test workflow
 
 on:
-  workflow_dispatch:
-  
+  workflow_dispatch
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        QQREAD_HEADER: ${{ secrets.QQREAD_HEADER }}
+        QQREAD_BODY: ${{ secrets.QQREAD_BODY }}
         QQREAD_TIMEURL: ${{ secrets.QQREAD_TIMEURL }}
         QQREAD_TIMEHEADER: ${{ secrets.QQREAD_TIMEHEADER }}
     steps:

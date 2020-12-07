@@ -34,12 +34,9 @@ function getCookiesFromSecret() {
   // catch value from Action Secret.
   if ($.isNode()) {
     let bodys = [], timeurls = [], timeheaders = [];
-    console.log("process.env.QQREAD_BODY : " + JSON.stringify(process.env.QQREAD_BODY));
-    console.log("process.env.QQREAD_TIMEURL : " + process.env.QQREAD_TIMEURL);
-    console.log("process.env.QQREAD_TIMEHEADER : " + process.env.QQREAD_TIMEHEADER);
     if (process.env.QQREAD_BODY) {
-      if (process.env.QQREAD_BODY.indexOf('#') > -1) {
-        bodys = process.env.QQREAD_BODY.split('#');
+      if (process.env.QQREAD_BODY.indexOf('\n') > -1) {
+        bodys = process.env.QQREAD_BODY.split('\n');
       } else {
         bodys = [process.env.QQREAD_BODY];
         console.log("QQREAD_BODY : " + bodys);
@@ -49,14 +46,13 @@ function getCookiesFromSecret() {
       } else {
         timeurls = [process.env.QQREAD_TIMEURL];
       };
-      if (process.env.QQREAD_TIMEHEADER.indexOf('#') > -1) {
-        timeheaders = process.env.QQREAD_TIMEHEADER.split('#');
+      if (process.env.QQREAD_TIMEHEADER.indexOf('\n') > -1) {
+        timeheaders = process.env.QQREAD_TIMEHEADER.split('\n');
       } else {
         timeheaders = [process.env.QQREAD_TIMEHEADER];
       };
     }
     for (let index = 0; index < bodys.length; index++) {
-      console.log("for :" + bodys);
       cookiesArr.push({
         "qqreadbodyVal": bodys[index] || "",
         "qqreadtimeurlVal": timeurls[index] || "",
