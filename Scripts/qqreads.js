@@ -9,13 +9,12 @@ console.log(`============ 脚本执行-北京时间(UTC+8)：${new Date(new Date
 const logs = 0; //0为关闭日志，1为开启
 const notifyInterval = 0;
 //0为关闭通知，1为所有通知，2为宝箱领取成功通知，3为宝箱每18次通知一次
-const dd = 1; //单次任务延迟,默认1秒
 const TIME = 30; //单次时长上传限制，默认5分钟
 const maxtime = 20; //每日上传时长限制，默认20小时
 const wktimess = 1200; //周奖励领取标准，默认1200分钟
 
 const qqreadurlVal = "https://mqqapi.reader.qq.com/mqq/user/init";
-let qqreadheaderVal, qqreadtimeurlVal, qqreadtimeheaderVal, cookiesArr = [];
+let qqreadbodyVal, qqreadtimeurlVal, qqreadtimeheaderVal, cookiesArr = [];
 var tz = '';
 let task = '', config, ssr2 = '', wktime;
 
@@ -30,15 +29,49 @@ let task = '', config, ssr2 = '', wktime;
     $.done();
   })
 
+
+function getCookiesFromSecret() {
+  // catch value from Action Secret.
+  if ($.isNode()) {
+    let bodys = [], timeurls = [], timeheaders = [];
+    if (process.env.QQREAD_BODY) {
+      if (process.env.QQREAD_BODY.indexOf('#') > -1) {
+        bodys = process.env.QQREAD_BODY.split('#');
+      } else {
+        bodys = [process.env.QQREAD_BODY];
+      };
+      if (process.env.QQREAD_TIMEURL.indexOf('\n') > -1) {
+        timeurls = process.env.QQREAD_TIMEURL.split('\n');
+      } else {
+        timeurls = [process.env.QQREAD_TIMEURL];
+      };
+      if (process.env.QQREAD_TIMEHEADER.indexOf('#') > -1) {
+        timeheaders = process.env.QQREAD_TIMEHEADER.split('#');
+      } else {
+        timeheaders = [process.env.QQREAD_TIMEHEADER];
+      };
+    }
+    for (let index = 0; index < bodys.length; index++) {
+      cookiesArr.push({
+        "qqreadbodyVal": bodys[index] || "",
+        "qqreadtimeurlVal": timeurls[index] || "",
+        "qqreadtimeheaderVal": timeheaders[index] || ""
+      });
+    }
+    console.log(`============ 共 ${cookiesArr.length} 个企鹅读书账号  =============\n`);
+  }
+}
+
 async function qqRead() {
   for (const item of cookiesArr) {
-    qqreadheaderVal = item["qqreadheaderVal"];
+    qqreadbodyVal = item["qqreadbodyVal"];
     qqreadtimeurlVal = item["qqreadtimeurlVal"];
     qqreadtimeheaderVal = item["qqreadtimeheaderVal"];
 
     await qqreadinfo();//用户名
     await qqreadconfig();//时长查询
     await qqreadtask();//任务列表
+    await qqreadtrack();//更新
 
     if (task.data.taskList[0].doneFlag == 0) await qqreaddayread();//阅读任务
     if (task.data.taskList[2].doneFlag == 0) {
@@ -64,44 +97,12 @@ async function qqRead() {
   await showmsg();//通知
 }
 
-function getCookiesFromSecret() {
-  // catch value from Action Secret.
-  if ($.isNode()) {
-    let headers = [], timeurls = [], timeheaders = [];
-    if (process.env.QQREAD_HEADER) {
-      if (process.env.QQREAD_HEADER.indexOf('#') > -1) {
-        headers = process.env.QQREAD_HEADER.split('#');
-      } else {
-        headers = [process.env.QQREAD_HEADER];
-      };
-      if (process.env.QQREAD_TIMEURL.indexOf('\n') > -1) {
-        timeurls = process.env.QQREAD_TIMEURL.split('\n');
-      } else {
-        timeurls = [process.env.QQREAD_TIMEURL];
-      };
-      if (process.env.QQREAD_TIMEHEADER.indexOf('#') > -1) {
-        timeheaders = process.env.QQREAD_TIMEHEADER.split('#');
-      } else {
-        timeheaders = [process.env.QQREAD_TIMEHEADER];
-      };
-    }
-    for (let index = 0; index < headers.length; index++) {
-      cookiesArr.push({
-        "qqreadheaderVal": headers[index] || "",
-        "qqreadtimeurlVal": timeurls[index] || "",
-        "qqreadtimeheaderVal": timeheaders[index] || ""
-      });
-    }
-    console.log(`============ 共 ${cookiesArr.length} 个企鹅读书账号  =============\n`);
-  }
-}
-
 //任务列表
 function qqreadtask() {
   return new Promise((resolve, reject) => {
     const toqqreadtaskurl = {
       url: "https://mqqapi.reader.qq.com/mqq/red_packet/user/page?fromGuid=",
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     $.get(toqqreadtaskurl, (error, response, data) => {
@@ -111,7 +112,7 @@ function qqreadtask() {
         "【任务列表】:余额 " +
         task.data.user.amount +
         " 金币（" + (task.data.user.amount / 10000) + " 元）\n" +
-      "【第" +
+        "【第" +
         task.data.invite.issue +
         "期】:时间 " +
         task.data.invite.dayRange +
@@ -168,12 +169,30 @@ function qqreadtask() {
   });
 }
 
+// 更新
+function qqreadtrack() {
+  return new Promise((resolve, reject) => {
+    const toqqreadtrackurl = {
+      url: "https://mqqapi.reader.qq.com/log/v4/mqq/track",
+      headers: JSON.parse(qqreadtimeheaderVal),
+      body: qqreadbodyVal,
+      timeout: 60000,
+    };
+    $.post(toqqreadtrackurl, (error, response, data) => {
+      if (logs) $.log(`${jsname}, 更新: ${data}`);
+      let track = JSON.parse(data);
+      tz += `【数据更新】:更新${track.msg}\n`;
+      resolve();
+    });
+  });
+}
+
 //用户名
 function qqreadinfo() {
   return new Promise((resolve, reject) => {
     const toqqreadinfourl = {
       url: qqreadurlVal,
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     $.get(toqqreadinfourl, (error, response, data) => {
@@ -191,7 +210,7 @@ function qqreadtake() {
   return new Promise((resolve, reject) => {
     const toqqreadtakeurl = {
       url: "https://mqqapi.reader.qq.com/mqq/sign_in/user",
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     $.post(toqqreadtakeurl, (error, response, data) => {
@@ -208,7 +227,7 @@ function qqreadconfig() {
   return new Promise((resolve, reject) => {
     const toqqreadconfigurl = {
       url: "https://mqqapi.reader.qq.com/mqq/page/config?router=%2Fpages%2Fbook-read%2Findex&options=",
-      headers: JSON.parse(qqreadheaderVal)
+      headers: JSON.parse(qqreadtimeheaderVal)
     };
     $.get(toqqreadconfigurl, (error, response, data) => {
       if (logs) $.log(`${jsname}, 阅读时长查询: ${data}`);
@@ -240,7 +259,7 @@ function qqreadssr1() {
   return new Promise((resolve, reject) => {
     const toqqreadssr1url = {
       url: `https://mqqapi.reader.qq.com/mqq/red_packet/user/read_time?seconds=30`,
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     if (config.data.pageParams.todayReadSeconds / 60 >= 1) {
@@ -261,7 +280,7 @@ function qqreadssr2() {
   return new Promise((resolve, reject) => {
     const toqqreadssr2url = {
       url: `https://mqqapi.reader.qq.com/mqq/red_packet/user/read_time?seconds=300`,
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     if (config.data.pageParams.todayReadSeconds / 60 >= 5) {
@@ -283,7 +302,7 @@ function qqreadssr3() {
   return new Promise((resolve, reject) => {
     const toqqreadssr3url = {
       url: `https://mqqapi.reader.qq.com/mqq/red_packet/user/read_time?seconds=1800`,
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     if (config.data.pageParams.todayReadSeconds / 60 >= 30) {
@@ -305,7 +324,7 @@ function qqreadsign() {
   return new Promise((resolve, reject) => {
     const toqqreadsignurl = {
       url: "https://mqqapi.reader.qq.com/mqq/red_packet/user/clock_in/page",
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     $.get(toqqreadsignurl, (error, response, data) => {
@@ -322,7 +341,7 @@ function qqreadsign2() {
   return new Promise((resolve, reject) => {
     const toqqreadsign2url = {
       url: "https://mqqapi.reader.qq.com/mqq/red_packet/user/clock_in_video",
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     $.get(toqqreadsign2url, (error, response, data) => {
@@ -339,7 +358,7 @@ function qqreaddayread() {
   return new Promise((resolve, reject) => {
     const toqqreaddayreadurl = {
       url: "https://mqqapi.reader.qq.com/mqq/red_packet/user/read_book",
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     $.get(toqqreaddayreadurl, (error, response, data) => {
@@ -356,7 +375,7 @@ function qqreadvideo() {
   return new Promise((resolve, reject) => {
     const toqqreadvideourl = {
       url: "https://mqqapi.reader.qq.com/mqq/red_packet/user/watch_video",
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     $.get(toqqreadvideourl, (error, response, data) => {
@@ -373,7 +392,7 @@ function qqreadbox() {
   return new Promise((resolve, reject) => {
     const toqqreadboxurl = {
       url: "https://mqqapi.reader.qq.com/mqq/red_packet/user/treasure_box",
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     $.get(toqqreadboxurl, (error, response, data) => {
@@ -390,7 +409,7 @@ function qqreadbox2() {
   return new Promise((resolve, reject) => {
     const toqqreadbox2url = {
       url: "https://mqqapi.reader.qq.com/mqq/red_packet/user/treasure_box_video",
-      headers: JSON.parse(qqreadheaderVal),
+      headers: JSON.parse(qqreadtimeheaderVal),
       timeout: 60000
     };
     $.get(toqqreadbox2url, (error, response, data) => {
@@ -407,7 +426,7 @@ function qqreadwktime() {
   return new Promise((resolve, reject) => {
     const toqqreadwktimeurl = {
       url: `https://mqqapi.reader.qq.com/mqq/v1/bookShelfInit`,
-      headers: JSON.parse(qqreadheaderVal)
+      headers: JSON.parse(qqreadtimeheaderVal)
     };
     $.get(toqqreadwktimeurl, (error, response, data) => {
       if (logs) $.log(`${jsname}, 阅读时长: ${data}`);
@@ -423,7 +442,7 @@ function qqreadpick() {
   return new Promise((resolve, reject) => {
     const toqqreadpickurl = {
       url: `https://mqqapi.reader.qq.com/mqq/pickPackageInit`,
-      headers: JSON.parse(qqreadheaderVal)
+      headers: JSON.parse(qqreadtimeheaderVal)
     };
     if (wktime.data.readTime >= wktimess) {
       $.get(toqqreadpickurl, (error, response, data) => {
@@ -436,7 +455,7 @@ function qqreadpick() {
             var Packageid = ["10", "10", "20", "30", "50", "80", "100", "120"];
             const toqqreadPackageurl = {
               url: `https://mqqapi.reader.qq.com/mqq/pickPackage?readTime=${pickid}`,
-              headers: JSON.parse(qqreadheaderVal),
+              headers: JSON.parse(qqreadtimeheaderVal),
               timeout: 60000,
             };
             $.get(toqqreadPackageurl, (error, response, data) => {
