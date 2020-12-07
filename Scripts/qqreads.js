@@ -35,6 +35,8 @@ function getCookiesFromSecret() {
   if ($.isNode()) {
     let bodys = [], timeurls = [], timeheaders = [];
     console.log("process.env.QQREAD_BODY : " + process.env.QQREAD_BODY);
+    console.log("process.env.QQREAD_TIMEURL : " + process.env.QQREAD_TIMEURL);
+    console.log("process.env.QQREAD_TIMEHEADER : " + process.env.QQREAD_TIMEHEADER);
     if (process.env.QQREAD_BODY) {
       if (process.env.QQREAD_BODY.indexOf('#') > -1) {
         bodys = process.env.QQREAD_BODY.split('#');
