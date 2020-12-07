@@ -39,6 +39,7 @@ function getCookiesFromSecret() {
         bodys = process.env.QQREAD_BODY.split('#');
       } else {
         bodys = [process.env.QQREAD_BODY];
+        console.log("QQREAD_BODY : " + bodys);
       };
       if (process.env.QQREAD_TIMEURL.indexOf('\n') > -1) {
         timeurls = process.env.QQREAD_TIMEURL.split('\n');
@@ -52,6 +53,7 @@ function getCookiesFromSecret() {
       };
     }
     for (let index = 0; index < bodys.length; index++) {
+      console.log("for :" + bodys);
       cookiesArr.push({
         "qqreadbodyVal": bodys[index] || "",
         "qqreadtimeurlVal": timeurls[index] || "",
