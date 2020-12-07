@@ -38,18 +38,17 @@ function getCookiesFromSecret() {
       if (process.env.QQREAD_BODY.indexOf('\n') > -1) {
         bodys = process.env.QQREAD_BODY.split('\n');
       } else {
-        bodys = [process.env.QQREAD_BODY];
-        console.log("QQREAD_BODY : " + bodys);
+        bodys = process.env.QQREAD_BODY.split();
       };
       if (process.env.QQREAD_TIMEURL.indexOf('\n') > -1) {
         timeurls = process.env.QQREAD_TIMEURL.split('\n');
       } else {
-        timeurls = [process.env.QQREAD_TIMEURL];
+        timeurls = process.env.QQREAD_TIMEURL.split();
       };
       if (process.env.QQREAD_TIMEHEADER.indexOf('\n') > -1) {
         timeheaders = process.env.QQREAD_TIMEHEADER.split('\n');
       } else {
-        timeheaders = [process.env.QQREAD_TIMEHEADER];
+        timeheaders = process.env.QQREAD_TIMEHEADER.split();
       };
     }
     for (let index = 0; index < bodys.length; index++) {
