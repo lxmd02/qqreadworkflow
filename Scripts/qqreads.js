@@ -54,9 +54,9 @@ function getCookiesFromSecret() {
     for (let index = 0; index < bodys.length; index++) {
       console.log(bodys[index]);
       cookiesArr.push({
-        "qqreadbodyVal": JSON.stringify(bodys[index]),
-        "qqreadtimeurlVal": JSON.stringify(timeurls[index]),
-        "qqreadtimeheaderVal": JSON.stringify(timeheaders[index])
+        "qqreadbodyVal": bodys[index] || "",
+        "qqreadtimeurlVal": timeurls[index] || "",
+        "qqreadtimeheaderVal": timeheaders[index] || ""
       });
     }
     console.log(`============ 共 ${cookiesArr.length} 个企鹅读书账号  =============\n`);
@@ -197,7 +197,6 @@ function qqreadinfo() {
       timeout: 60000
     };
     $.get(toqqreadinfourl, (error, response, data) => {
-      //console.log(data);
       if (logs) $.log(`${jsname}, 用户名: ${data}`);
       const info = JSON.parse(data);
       tz += "\n【用户信息】: " + info.data.user.nickName + "\n";
