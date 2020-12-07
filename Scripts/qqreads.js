@@ -52,10 +52,11 @@ function getCookiesFromSecret() {
       };
     }
     for (let index = 0; index < bodys.length; index++) {
+      console.log(bodys[index]);
       cookiesArr.push({
-        "qqreadbodyVal": bodys[index] || "",
-        "qqreadtimeurlVal": timeurls[index] || "",
-        "qqreadtimeheaderVal": timeheaders[index] || ""
+        "qqreadbodyVal": JSON.stringify(bodys[index]),
+        "qqreadtimeurlVal": JSON.stringify(timeurls[index]),
+        "qqreadtimeheaderVal": JSON.stringify(timeheaders[index])
       });
     }
     console.log(`============ 共 ${cookiesArr.length} 个企鹅读书账号  =============\n`);
